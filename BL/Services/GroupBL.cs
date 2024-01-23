@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BL.Interfaces;
+using DAL.Exceptions;
 using DAL.Interfaces;
 using DAL.Models;
 using DTO.Models;
@@ -24,16 +25,28 @@ namespace BL.Services
 
         public async Task Add(GroupDTO item)
         {
-             await groupRepository.Add(mapper.Map<Group>(item));
+            try { 
+             await groupRepository.Add(mapper.Map<Group>(item));}
+            catch (Exception ex)
+            {
+                if (ex.GetType() != typeof(DALException) && ex.GetType() != typeof(NotFoundException))
+                {
+                    throw new BLException("There is a problem to map");
+                }
+                else
+                    throw;
+            }
         }
 
         public async Task Delete(int id)
         {
+
              await groupRepository.Delete(id);
         }
 
         public async Task<List<GroupDTO>> GetAll()
         {
+            try { 
             List<Group>groups = await groupRepository.GetAll();
             List<GroupDTO>groupDTOs = new List<GroupDTO>();
             foreach (Group group in groups)
@@ -42,6 +55,16 @@ namespace BL.Services
             }
             return groupDTOs;
                 }
+            catch (Exception ex)
+            {
+                if (ex.GetType() != typeof(DALException) && ex.GetType() != typeof(NotFoundException))
+                {
+                    throw new BLException("There is a problem to map");
+                }
+                else
+                    throw;
+            }
+        }
 
         public async Task<GroupDTO> GetByID(int id)
         {
@@ -50,8 +73,18 @@ namespace BL.Services
 
         public async Task<GroupDTO> Update(GroupDTO item, int id)
         {
+            try { 
             return mapper.Map<GroupDTO>(
-               await groupRepository.Update(mapper.Map<Group>(item), id));
+               await groupRepository.Update(mapper.Map<Group>(item), id));}
+            catch (Exception ex)
+            {
+                if (ex.GetType() != typeof(DALException) && ex.GetType() != typeof(NotFoundException))
+                {
+                    throw new BLException("There is a problem to map");
+                }
+                else
+                    throw;
+            }
         }
     }
 }

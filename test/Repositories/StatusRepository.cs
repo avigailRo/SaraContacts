@@ -1,4 +1,5 @@
-﻿using DAL.Interfaces;
+﻿using DAL.Exceptions;
+using DAL.Interfaces;
 using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,44 +19,67 @@ namespace DAL.Implementation
         }
         public async Task  Add(Status item)
         {
-        
-                if (item != null)
-                {
+            try { 
           
                 await data.Statuses.AddAsync(item);
-                await data.SaveChangesAsync();
-                     }
-            else { }
+                await data.SaveChangesAsync();}
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
 
-            
+
+
 
         }
 
         public async Task Delete(int id)
         {
-         
+            try { 
                 var x = await data.Statuses.FirstOrDefaultAsync(s => s.Id == id);
                 if (x != null)
                 {
                     data.Statuses.Remove(x);
                    await  data.SaveChangesAsync();
                 }
-                else {  }
-            
-     
+                else
+                {
+                    throw new NotFoundException("The item dosent exist");
+                }
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException("The item dosent exist");
+            }
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
+
+
         }
 
         public async Task<List<Status>> GetAll()
         {
-            return await data.Statuses.ToListAsync();
+            try { 
+            return await data.Statuses.ToListAsync();}
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
         }
 
         public async Task<Status> Update(Status item, int id)
         {
+            try { 
             item.Id = id;  
             data.Statuses.Update(item);
             await data.SaveChangesAsync();
-            return item;    
+            return item;}
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
         }
     }
 }

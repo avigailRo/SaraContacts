@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using BL.Interfaces;
 using BL.Services;
 using DAL.Models;
+using DAL.Exceptions;
 
 namespace UI.Controllers
 {
@@ -19,28 +20,146 @@ namespace UI.Controllers
         }
 
         [HttpGet("GetAll")]
-        public async Task<ActionResult<List<Language>>> GetAll()
+        public async Task<ActionResult<List<LanguageDTO>>> GetAll()
         {
-            return Ok(await languageBL.GetAll());
+            List<LanguageDTO>languages = new List<LanguageDTO>();
+            try
+            {
+                languages = await languageBL.GetAll();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(null);
+            }
+            catch (DALException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 409
+                };
+            }
+            catch (BLException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 411
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 500
+                };
+
+            }
+            return Ok();
         }
 
         [HttpPost("AddLanguage")]
         public async Task<ActionResult<bool>> AddLanguage(LanguageDTO language)
         {
-            await languageBL.Add(language);
+            try { 
+            await languageBL.Add(language);}
+            catch (NotFoundException ex)
+            {
+                return NotFound(null);
+            }
+            catch (DALException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 409
+                };
+            }
+            catch (BLException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 411
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 500
+                };
+
+            }
             return Ok();
         }
         [HttpPut]
         [Route("UpdateLanguage/{id}")]
         public async Task<ActionResult<LanguageDTO>> UpdateLanguage(LanguageDTO language, int id)
         {
-            return Ok(await languageBL.Update(language, id));
+            try
+            {
+                await languageBL.Update(language, id);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(null);
+            }
+            catch (DALException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 409
+                };
+            }
+            catch (BLException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 411
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 500
+                };
+
+            }
+            return Ok();
         }
         [HttpDelete]
         [Route("DeleteLanguage/{id}")]
         public async Task<ActionResult<bool>> DeleteLanguage(int id)
         {
-            await languageBL.Delete(id);
+            try {   await languageBL.Delete(id);}
+            catch (NotFoundException ex)
+            {
+                return NotFound(null);
+            }
+            catch (DALException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 409
+                };
+            }
+            catch (BLException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 411
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 500
+                };
+
+            }
             return Ok();
         }
     }

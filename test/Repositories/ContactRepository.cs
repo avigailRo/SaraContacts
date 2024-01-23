@@ -1,4 +1,5 @@
-﻿using DAL.Interfaces;
+﻿using DAL.Exceptions;
+using DAL.Interfaces;
 using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,13 +19,20 @@ namespace DAL.Implementation
         }
         public async Task Add(Contact item)
         {
-            await data.Contacts.AddAsync(item);
-            await data.SaveChangesAsync();
+            try
+            {
+                await data.Contacts.AddAsync(item);
+                await data.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
         }
 
         public async Task Delete(int id)
         {
-
+            try { 
             var x = await data.Contacts.FirstOrDefaultAsync(c => c.Id == id);
             if (x != null)
             {
@@ -33,7 +41,16 @@ namespace DAL.Implementation
             }
             else
             {
+                throw new NotFoundException("The item dosent exist");
 
+            }}
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException("The item dosent exist");
+            }
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
             }
 
 
@@ -41,15 +58,27 @@ namespace DAL.Implementation
 
         public async Task<List<Contact>> GetAll()
         {
-            return await data.Contacts.ToListAsync();
+            try
+            {
+                return await data.Contacts.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
         }
 
         public async Task<Contact> Update(Contact item, int id)
         {
+            try { 
             item.Id = id;
             data.Contacts.Update(item);
             await data.SaveChangesAsync();
-            return item;
+            return item;}
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
 
 
         }

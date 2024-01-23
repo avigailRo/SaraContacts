@@ -1,4 +1,5 @@
-﻿using DAL.Interfaces;
+﻿using DAL.Exceptions;
+using DAL.Interfaces;
 using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,46 +19,66 @@ namespace DAL.Implementation
         }
         public async Task Add(Language item)
         {
-   
-                if (item != null)
-                {
-                
+            try {
                 await data.Languages.AddAsync(item);
-                await data.SaveChangesAsync();
-
-                 }
-            else
+            await data.SaveChangesAsync(); }
+            catch (Exception ex)
             {
-
+                throw new DALException("There is a problem saving the data to the db");
             }
+
 
         }
 
         public async Task Delete(int id)
         {
-
+            try { 
                 var x = await data.Languages.FirstOrDefaultAsync(l => l.Id == id);
                 if (x != null)
                 {
                     data.Languages.Remove(x);
                    await  data.SaveChangesAsync();
                 }
-                else {  }
-            
+                else {
+                    throw new NotFoundException("The item dosent exist");
+                }
+            }
+            catch (NotFoundException ex)
+            {
+                throw new NotFoundException("The item dosent exist");
+            }
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
+
+
 
         }
 
         public async Task<List<Language>> GetAll()
         {
-            return await data.Languages.ToListAsync();
+            try { 
+            return await data.Languages.ToListAsync();}
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
+
         }
 
         public async Task<Language> Update(Language item, int id)
         {
+            try { 
             item.Id = id;
             data.Languages.Update(item);
             await data.SaveChangesAsync();  
-            return item;
+            return item;}
+            catch (Exception ex)
+            {
+                throw new DALException("There is a problem saving the data to the db");
+            }
+
         }
     }
 }

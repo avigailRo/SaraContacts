@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BL.Interfaces;
+using DAL.Exceptions;
 using DAL.Interfaces;
 using DAL.Models;
 using DTO.Models;
@@ -24,7 +25,17 @@ namespace BL.Services
 
         public async Task Add(CountryDTO item)
         {
-             await countryRepository.Add(mapper.Map<Country>(item));
+            try { 
+             await countryRepository.Add(mapper.Map<Country>(item));}
+            catch (Exception ex)
+            {
+                if (ex.GetType() != typeof(DALException) && ex.GetType() != typeof(NotFoundException))
+                {
+                    throw new BLException("There is a problem to map");
+                }
+                else
+                    throw;
+            }
         }
 
         public async Task Delete(int id)
@@ -34,13 +45,23 @@ namespace BL.Services
 
         public async Task<List<CountryDTO>> GetAll()
         {
+            try { 
             List<Country>countries = await countryRepository.GetAll();
             List<CountryDTO> result = new List<CountryDTO>();
             foreach (var country in countries)
             {
                 result.Add(mapper.Map<CountryDTO>(country));    
             }
-            return result;
+            return result;}
+            catch (Exception ex)
+            {
+                if (ex.GetType() != typeof(DALException) && ex.GetType() != typeof(NotFoundException))
+                {
+                    throw new BLException("There is a problem to map");
+                }
+                else
+                    throw;
+            }
         }
 
         public async Task<CountryDTO> GetByID(int id)
@@ -50,8 +71,18 @@ namespace BL.Services
 
         public async Task<CountryDTO> Update(CountryDTO item, int id)
         {
+            try { 
             return mapper.Map<CountryDTO>(
-                await   countryRepository.Update(mapper.Map<Country>(item), id));
+                await   countryRepository.Update(mapper.Map<Country>(item), id));}
+            catch (Exception ex)
+            {
+                if (ex.GetType() != typeof(DALException) && ex.GetType() != typeof(NotFoundException))
+                {
+                    throw new BLException("There is a problem to map");
+                }
+                else
+                    throw;
+            }
         }
     }
 }

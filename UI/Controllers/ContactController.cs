@@ -1,5 +1,6 @@
 ﻿using BL.Interfaces;
 using BL.Services;
+using DAL.Exceptions;
 using DAL.Models;
 using DTO.Models;
 using Microsoft.AspNetCore.Http;
@@ -17,28 +18,145 @@ namespace UI.Controllers
             this.contactBL = contactBL;
         }
         [HttpGet("GetAllContacts")]
-        public async Task<ActionResult<List<Contact>>> GetAllContacts()
+        public async Task<ActionResult<List<ContactDTO>>> GetAllContacts()
         {
-            return Ok(await contactBL.GetAll());
+            List<ContactDTO> contacts;
+            try {
+            contacts = await contactBL.GetAll(); }
+            catch (NotFoundException ex)
+            {
+                return NotFound(null);
+            }
+            catch (DALException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 409
+                };
+            }
+            catch (BLException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 411
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 500
+                };
+
+            }
+            return Ok();
         }
 
         [HttpPost("AddContact")]
         public async Task<ActionResult<bool>> AddContact(ContactDTO contact)
         {
-            await contactBL.Add(contact);
+            try { 
+            await contactBL.Add(contact);}
+            catch (NotFoundException ex)
+            {
+                return NotFound(null);
+            }
+            catch (DALException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 409
+                };
+            }
+            catch (BLException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 411
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 500
+                };
+
+            }
             return Ok();
         }
         [HttpPut]
         [Route("UpdateContact/{id}")]
-        public async Task<ActionResult<bool>> UpdateContact(ContactDTO contact, int id)
+        public async Task<ActionResult> UpdateContact(ContactDTO contact, int id)
         {
-            return Ok(await contactBL.Update(contact, id));
+            try
+            {
+                await contactBL.Update(contact, id);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(null);
+            }
+            catch (DALException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 409
+                };
+            }
+            catch (BLException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 411
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 500
+                };
+
+            }
+            return Ok();
         }
         [HttpDelete]
         [Route("DeleteContact/{id}")]
         public async Task<ActionResult<bool>> DeleteContact(int id)
         {
-            await contactBL.Delete(id);
+            try { 
+            await contactBL.Delete(id);}
+            catch (NotFoundException ex)
+            {
+                return NotFound(null);
+            }
+            catch (DALException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 409
+                };
+            }
+            catch (BLException ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 411
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new { ErrorMessage = ex.Message })
+                {
+                    StatusCode = 500
+                };
+
+            }
             return Ok();
         }
         [HttpGet]
